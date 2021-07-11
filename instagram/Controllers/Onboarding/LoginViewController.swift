@@ -195,6 +195,16 @@ class LoginViewController: UIViewController {
         
     }
     
+    func presentAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title,
+                                      message: message,
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Dismiss",
+                                      style: .cancel,
+                                      handler: nil))
+        self.present(alert, animated: true)
+    }
+    
     private func addSubviews() {
         view.addSubview(usernameEmailField)
         view.addSubview(passwordField)
@@ -215,9 +225,31 @@ class LoginViewController: UIViewController {
                 return
         }
         
+        var username: String?
+        var email: String?
+        
         // Login functionality
+        if usernameEmail.contains("@"), usernameEmail.contains(".") {
+            // email
+            email = usernameEmail
+        }
+        else {
+            // username
+            username = usernameEmail
+        }
         
+        AuthManager.shared.loginUser(username: username, email: email, password: password) { success in
+            DispatchQueue.main.async {
+                if success {
+                    // user logged in
+                    self.dismiss(animated: true, completion: nil)
+                } else {
+                    // error occurred
+                    self.presentAlert(title: "Log In Error", message: "We were unable to log you in.")
+                }
+            }
         
+        }
     }
     
     @objc private func didTapTermsButton() {
